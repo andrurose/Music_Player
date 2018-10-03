@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Music Player</string>
+    <string name="title_artists">Artists</string>
+    <string name="title_songs">Songs</string>
+    <string name="title_filler">Filler</string>
+    <string name="song_title">Title Unknown</string>
+    <string name="song_artist">Artist Unknown</string>
+    <string name="title_album">Album Unknown</string>
+    <string name="track_num">1 of 1</string>
+
+</resources>
