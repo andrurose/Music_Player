@@ -23,13 +23,13 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_artists);
+                    mTextMessage.setText(R.string.nav_artists);
                     return true;
                 case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_songs);
+                    mTextMessage.setText(R.string.nav_songs);
                     return true;
                 case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_filler);
+                    mTextMessage.setText(R.string.nav_filler);
                     return true;
             }
             return false;
