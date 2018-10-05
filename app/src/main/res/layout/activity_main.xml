@@ -7,22 +7,26 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    tools:layout_editor_absoluteY="81dp">
 
     <ImageView
         android:id="@+id/albumCover"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         android:src="@drawable/music"
+        app:layout_constraintBottom_toTopOf="@+id/songTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <!--    <LinearLayout
         android:layout_width="wrap_content"
@@ -37,42 +41,39 @@
     <TextView
         android:id="@+id/songTitle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_height="17dp"
+        android:layout_marginBottom="28dp"
         android:text="@string/song_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.514"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/albumCover" />
+        app:layout_constraintBottom_toTopOf="@+id/songArtist"
+        app:layout_constraintEnd_toEndOf="@+id/albumTitle"
+        app:layout_constraintHorizontal_bias="0.461"
+        app:layout_constraintStart_toStartOf="@+id/albumTitle" />
 
     <TextView
         android:id="@+id/songArtist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:text="@string/song_artist"
-        app:layout_constraintBottom_toTopOf="@+id/albumTitle"
-        app:layout_constraintEnd_toEndOf="@+id/songTitle"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/songTitle"
-        app:layout_constraintTop_toBottomOf="@+id/songTitle"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintBottom_toTopOf="@+id/seekTimeBar"
+        app:layout_constraintEnd_toEndOf="@+id/albumTitle"
+        app:layout_constraintStart_toStartOf="@+id/albumTitle" />
 
     <TextView
         android:id="@+id/albumTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="168dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/title_album"
-        app:layout_constraintBottom_toTopOf="@+id/navigation"
-        app:layout_constraintEnd_toEndOf="@+id/songTitle"
-        app:layout_constraintHorizontal_bias="0.769"
-        app:layout_constraintStart_toStartOf="@+id/songTitle" />
+        app:layout_constraintBottom_toTopOf="@+id/seekTimeBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/songArtist"
+        app:layout_constraintVertical_bias="1.5" />
 
     <SeekBar
         android:id="@+id/seekTimeBar"
@@ -103,7 +104,7 @@
             android:layout_height="match_parent"
             android:layout_marginEnd="280dp"
             android:layout_marginRight="280dp"
-            android:text="0:11"
+            android:text="0:00"
             app:layout_constraintEnd_toStartOf="@+id/remainingTimeLabel"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -113,7 +114,7 @@
             android:id="@+id/remainingTimeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-1:49"
+            android:text="-0:00"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/elapsedTimeLabel"
@@ -187,12 +188,12 @@
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/navigation" />
 
-    <Button
+    <ImageView
         android:id="@+id/playBtn"
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/play_button"
+        android:background="@drawable/selector_play_pause"
         app:layout_constraintBottom_toTopOf="@+id/volBarLayout"
         app:layout_constraintEnd_toStartOf="@+id/nextBtn"
         app:layout_constraintHorizontal_bias="0.5"
