@@ -1,13 +1,19 @@
 package com.example.rgs.audiovideodemo;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,16 +26,18 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView navText;
+    TextView navText;
     ImageView playBtn;
-    SeekBar seekTimeBar;
-    SeekBar volumeBar;
+    SeekBar seekTimeBar = null;
+    SeekBar volumeBar = null;
     TextView elapsedTimeLabel;
     TextView remainingTimeLabel;
     MediaPlayer mp;
     TextView albumTitle;
     TextView songTitle;
     TextView songArtist;
+    AudioManager audioManager = null;
+
 
     int totalTime;
 
@@ -56,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setContentView(R.layout.activity_main);
 
         // Initialize Variables
@@ -70,11 +79,13 @@ public class MainActivity extends AppCompatActivity {
         songTitle = findViewById(R.id.songTitle);
         albumTitle = findViewById(R.id.albumTitle);
 
+        initControls();
+
         // Media Player
         mp = MediaPlayer.create(this, R.raw.aftermath);
         mp.setLooping(true);
         mp.seekTo(0);
-        mp.setVolume(0.5f,0.5f);
+        //mp.setVolume(0.5f,0.5f);
         totalTime = mp.getDuration();
 
 
@@ -104,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Volume Bar
-        volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+/*        volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 float volumeNum = progress / 100f;
@@ -120,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
 
             }
-        });
+        });*/
 
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,6 +165,66 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }).start();
+
+    }
+    private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+    private BecomingNoisyReceiver myNoisyAudioStreamReceiver = new BecomingNoisyReceiver();
+
+
+
+
+
+    private class BecomingNoisyReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                // Pause the playback
+                mp.pause();
+            }
+        }
+
+        MediaSessionCompat.Callback callback = new
+                MediaSessionCompat.Callback() {
+                    @Override
+                    public void onPlay() {
+                        registerReceiver(myNoisyAudioStreamReceiver, intentFilter);
+                    }
+
+                    @Override
+                    public void onStop() {
+                        unregisterReceiver(myNoisyAudioStreamReceiver);
+                    }
+                };
+    }
+    private void initControls() {
+        try {
+            audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            volumeBar.setMax(audioManager
+                    .getStreamMaxVolume(AudioManager.STREAM_MUSIC));
+            volumeBar.setProgress(audioManager
+                    .getStreamVolume(AudioManager.STREAM_MUSIC));
+
+
+            volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onStopTrackingTouch(SeekBar arg0) {
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar arg0) {
+                }
+
+                @Override
+                public void onProgressChanged(SeekBar arg0, int progress, boolean arg2) {
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                            progress, 0);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @Override
@@ -172,7 +243,9 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler(){
+        @SuppressLint("SetTextI18n")
         @Override
         public void handleMessage(Message msg) {
             int currentPosition = msg.what;
@@ -186,6 +259,8 @@ public class MainActivity extends AppCompatActivity {
             remainingTimeLabel.setText("- " + remainingTime);
         }
     };
+
+
 
     private String createTimeLabel(int time) {
         String timeLabel;
