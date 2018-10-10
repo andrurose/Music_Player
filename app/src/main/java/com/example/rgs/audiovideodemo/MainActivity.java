@@ -24,21 +24,34 @@ import android.widget.SearchView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class MainActivity extends AppCompatActivity {
-
-    TextView navText;
+    @BindView(R.id.playBtn)
     ImageView playBtn;
-    SeekBar seekTimeBar = null;
-    SeekBar volumeBar = null;
+    @BindView(R.id.elapsedTimeLabel)
     TextView elapsedTimeLabel;
+    @BindView(R.id.remainingTimeLabel)
     TextView remainingTimeLabel;
-    MediaPlayer mp;
-    TextView albumTitle;
-    TextView songTitle;
+    @BindView(R.id.seekTimeBar)
+    SeekBar seekTimeBar = null;
+    @BindView(R.id.volumeBar)
+    SeekBar volumeBar = null;
+    @BindView(R.id.songArtist)
     TextView songArtist;
+    @BindView(R.id.songTitle)
+    TextView songTitle;
+    @BindView(R.id.albumTitle)
+    TextView albumTitle;
+    @BindView(R.id.navigation)
+    BottomNavigationView navigation;
+
+    // Locals
+    TextView navText;
+    MediaPlayer mp;
     AudioManager audioManager = null;
-
-
     int totalTime;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -66,20 +79,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setContentView(R.layout.activity_main);
-
+        ButterKnife.bind(this);
         // Initialize Variables
         //navText = findViewById(R.id.songTitle);
-        playBtn = findViewById(R.id.playBtn);
-        elapsedTimeLabel = findViewById(R.id.elapsedTimeLabel);
-        remainingTimeLabel = findViewById(R.id.remainingTimeLabel);
-        BottomNavigationView navigation =  findViewById(R.id.navigation);
-        seekTimeBar = findViewById(R.id.seekTimeBar);
-        volumeBar = findViewById(R.id.volumeBar);
-        songArtist = findViewById(R.id.songArtist);
-        songTitle = findViewById(R.id.songTitle);
-        albumTitle = findViewById(R.id.albumTitle);
-
-        initControls();
+        setVolumeBar();
 
         // Media Player
         mp = MediaPlayer.create(this, R.raw.aftermath);
@@ -87,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
         mp.seekTo(0);
         //mp.setVolume(0.5f,0.5f);
         totalTime = mp.getDuration();
-
 
         // Setup Navigation Bottom Bar
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -133,21 +135,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
 
-        playBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playBtn.setActivated(!playBtn.isActivated());
-
-                if(!mp.isPlaying()){
-                    mp.start();
-                    //playBtn.setActivated(playBtn.isActivated());
-                }else{
-                    mp.pause();
-                    playBtn.setActivated(playBtn.isActivated());
-                }
-            }
-        });
-
         // Thread (Update seektime and time label)
         new Thread(new Runnable() {
             @Override
@@ -156,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         Message msg = new Message();
                         msg.what = mp.getCurrentPosition();
-                        handler.sendMessage(msg);
+                        seekBarHandler.sendMessage(msg);
                         Thread.sleep(1000);
 
                     } catch (InterruptedException e){
@@ -169,10 +156,6 @@ public class MainActivity extends AppCompatActivity {
     }
     private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
     private BecomingNoisyReceiver myNoisyAudioStreamReceiver = new BecomingNoisyReceiver();
-
-
-
-
 
     private class BecomingNoisyReceiver extends BroadcastReceiver {
         @Override
@@ -196,14 +179,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 };
     }
-    private void initControls() {
+    private void setVolumeBar() {
         try {
             audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            volumeBar.setMax(audioManager
-                    .getStreamMaxVolume(AudioManager.STREAM_MUSIC));
-            volumeBar.setProgress(audioManager
-                    .getStreamVolume(AudioManager.STREAM_MUSIC));
-
+            volumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
+            volumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
 
             volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
@@ -223,8 +203,20 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
-
+    @OnClick(R.id.playBtn)
+    public void setPlayBtn(View v){
+        if(v == playBtn){
+            playBtn.setActivated(!playBtn.isActivated());
+            if(!mp.isPlaying()){
+                mp.start();
+                //playBtn.setActivated(playBtn.isActivated());
+            }else{
+                mp.pause();
+                playBtn.setActivated(playBtn.isActivated());
+            }
+        }
     }
 
     @Override
@@ -244,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("HandlerLeak")
-    private Handler handler = new Handler(){
+    private Handler seekBarHandler = new Handler(){
         @SuppressLint("SetTextI18n")
         @Override
         public void handleMessage(Message msg) {
