@@ -106,14 +106,12 @@ public class MainActivity extends AppCompatActivity {
                         msg.what = mp.getCurrentPosition();
                         seekBarHandler.sendMessage(msg);
                         Thread.sleep(1000);
-
                     } catch (InterruptedException e){
 
                     }
                 }
             }
         }).start();
-
     }
 
     private void setSeek(){
@@ -155,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onProgressChanged(SeekBar arg0, int progress, boolean arg2) {
+                public void onProgressChanged(SeekBar volumeSeek, int progress, boolean fromUser) {
                     audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
                             progress, 0);
                 }
@@ -173,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
             playBtn.setActivated(!playBtn.isActivated());
             if(!mp.isPlaying()){
                 mp.start();
-                //playBtn.setActivated(playBtn.isActivated());
             }else{
                 mp.pause();
                 playBtn.setActivated(playBtn.isActivated());
@@ -198,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("HandlerLeak")
-    private Handler seekBarHandler = new Handler(){
+    private Handler seekBarHandler = new Handler() {
         @SuppressLint("SetTextI18n")
         @Override
         public void handleMessage(Message msg) {
